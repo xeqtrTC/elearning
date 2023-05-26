@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Barlow&display=swap");
+
+
+@layer components {
+    .liHover {
+        @apply hover:border-b-4 border-[#0E111E] py-5 cursor-pointer font-medium text-lg
+    }
+    .transitionOverlay {
+        @apply transition-all duration-200 ease-in-out
+    }
+    .buttonHoverButtons { 
+        @apply p-2 border rounded-full hover:bg-white hover:text-black cursor-pointer transitionOverlay
+    }
+    .inputCourseDetails { 
+        @apply py-2 rounded-lg outline-none text-black px-5
+    }
+    .divWidth {
+        @apply w-[90%] md:w-[80%] xl:w-[70%]  m-auto          
+    }
+    .divMainPageMap {
+        @apply bg-[#0E111E] space-y-2 text-white font-medium p-3 rounded-md
+    }
+    .hoverAdminLink {
+        @apply hover:bg-black/40 py-2 px-5 transitionOverlay 
+    }
+    .inputEditUser {
+        @apply bg-[#fafafa] border-[1.5px] outline-none border-[#F0F0F0] py-2 px-3 rounded-md
+    }
+    .inputEditUserButton {
+        @apply bg-[#0E111E] py-2 px-3 rounded-md text-white font-medium disabled:cursor-not-allowed 
+    }
+    .inputAddInstructor {
+        @apply border-[#adadad] border-[1px] outline-none rounded-md w-full py-2 px-5
+    }
+    .labelEdit {
+        @apply text-[#616161] py-1 px-2 font-medium
+    }
+    .meetInstructorLinks {
+        @apply border border-[#4c0ffb] p-2 rounded-full text-[#4c0ffb] hover:bg-[#4c0ffb] hover:text-white cursor-pointer transitionOverlay
+    }
+    .buttonWithoutHover {
+        @apply bg-[#4c0ffb] p-2 rounded-lg text-white font-medium
+    }
+    .aboutInstructorButton {
+        @apply border border-[#4c0ffb] p-2 rounded-lg text-[#4c0ffb] hover:bg-[#4c0ffb] hover:text-white cursor-pointer w-full font-medium uppercase transitionOverlay
+    }
+    .buttonWithHoverWithoutWidth {
+        @apply border border-[#4c0ffb] p-2 rounded-lg text-[#4c0ffb] hover:bg-[#4c0ffb] hover:text-white cursor-pointer  font-medium uppercase transitionOverlay
+    }
+    .responsiveNormal {
+        @apply m-auto  w-[95%]  md:w-[95%] lg:w-[90%] xl:w-[85%] 2xl:w-[80%]
+    }
+    .responsiveWithGrid {
+        @apply grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  gap-5 
+    }
+    .responsiveGrid {
+        @apply grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  gap-5
+    }
+    .subOrUnSubButton {
+        @apply px-10 py-3 bg-[#F51767] border-[#949494]  hover:bg-[#bb2058] text-white uppercase font-medium rounded-[30px]  transitionOverlay
+    }
+    .adminPanelGrid {
+        @apply p-5 grid  md:grid-cols-2 gap-5
+    }
+    
+}
