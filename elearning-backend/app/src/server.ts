@@ -49,6 +49,7 @@ app.use('/users', require('./routers/userRouter'))
 app.use('/roles', require('./routers/roleRouter'))
 app.use('/courses', require('./routers/courseRouter'))
 app.use('/sockets', require('./routers/socketRouter'))
+app.use('/pdf', require('./routers/pdfRouter'))
 
 server.listen(5000, () => {
     console.log('server radi na 5000 portu')

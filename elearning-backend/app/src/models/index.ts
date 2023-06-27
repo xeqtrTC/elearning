@@ -21,6 +21,17 @@ import { Users } from "./user.model";
 import { whatyoubuild } from "./whatyoubuild.model";
 import { Whatyoulearn } from "./whatyoulearn.model";
 import { InstructorsOnCourses } from "./instructor.model";
+import { LessonDetailsCompletion } from "./LessonsDetailsCompletion";
+import { LessonCompletion } from "./LessonCompletion";
+import { CourseCompletion } from "./CourseCompletion";
+import { BadgeForUsers } from "./badgesForUsers.model";
+import { Badges } from "./badges.model";
+import { BadgeCriteria } from "./badgeCritieria.model";
+import { RequirementBadgesType } from "./requirementType.model";
+import { Quizz } from "./Quizz.model";
+import { QuizzAnswer } from "./QuizzAnswer.model";
+import { QuizzQuestion } from "./QuizzQuestion.model";
+import { QuizzLessonsCombined } from "./quizzLessonsCombined.model";
 
 const sequelize = new Sequelize({
   database: dbConfig.DB,
@@ -52,7 +63,18 @@ try {
     reviews,
     RoleUsers,
     Whatyoulearn,
-    InstructorsOnCourses
+    InstructorsOnCourses,
+    LessonDetailsCompletion,
+    LessonCompletion,
+    CourseCompletion,
+    Badges,
+    BadgeForUsers,
+    BadgeCriteria,
+    RequirementBadgesType,
+    Quizz,
+    QuizzAnswer,
+    QuizzQuestion,
+    QuizzLessonsCombined
   ])
   
 } catch (error: any) {
@@ -87,5 +109,15 @@ export {
   Users,
   whatyoubuild,
   Whatyoulearn,
-  InstructorsOnCourses
+  InstructorsOnCourses,
+  LessonDetailsCompletion,
+  LessonCompletion,
+  Badges,
+  CourseCompletion,
+  BadgeForUsers,
+  RequirementBadgesType,
+  Quizz,
+  QuizzAnswer,
+  QuizzQuestion,
+  QuizzLessonsCombined
 }

@@ -13,7 +13,7 @@ const CourseCurriculum = ({ lessons, setLessonIdFunction }: courseDetailsArrayPr
         <div className="py-10 space-y-5">
                 {
                     lessons?.map((item: lessonProps) => {
-                        const { description, lesson_id, details } = item
+                        const { description, lesson_id, details, } = item
                         return (
                             <div className={`py-10  font-Barlow border-b  border-[#f6f6fb]  px-10 rounded-2xl ${lesson_id === showUp && 'bg-white'}`} key={lesson_id}>
                                 <div className="flex justify-between pb-5 cursor-pointer" onClick={() => setShowUp(lesson_id === showUp ? null : lesson_id)} >
@@ -32,7 +32,7 @@ const CourseCurriculum = ({ lessons, setLessonIdFunction }: courseDetailsArrayPr
                                 {
                                     lesson_id === showUp && (
                                         details?.map((item) => {
-                                            const { lessonDetail_id, title, lessonId: lessonSecond_id, video_link } = item;
+                                            const { lessonDetail_id, title, lessonId: lessonSecond_id, video_link, lessonDetail_fakeID } = item;
                                             return (
                                                 lessonSecond_id === lesson_id && (
                                                     <div className="flex justify-between border-t py-5" key={lessonDetail_id}>
@@ -55,7 +55,7 @@ const CourseCurriculum = ({ lessons, setLessonIdFunction }: courseDetailsArrayPr
                                                             hover:bg-[#4c0ffb]
                                                             hover:text-white 
                                                             transitionOverlay"
-                                                            onClick={() => setLessonIdFunction(lessonSecond_id)}
+                                                            onClick={() => setLessonIdFunction(lessonDetail_fakeID)}
                                                             >
                                                                 PREVIEW
                                                             </button>

@@ -36,7 +36,7 @@ const About = () => {
             )
         })
         content = (
-            <div className="flex flex-col">
+            <div className="flex flex-col w-[80%] m-auto">
                 <div>
                     <span className="text-xl font-bold">What E learning platform is all about</span>
                 </div>
@@ -44,7 +44,7 @@ const About = () => {
                     <div className="text-center">
                         <span className="text-4xl font-bold">Meet our world class instructors</span>
                     </div>
-                    <div className="responsiveWithGrid">                              
+                    <div className="responsiveGrid">                              
                         {
                             mappedInstructors
                         }                                                  

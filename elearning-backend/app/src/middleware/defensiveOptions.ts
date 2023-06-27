@@ -1,24 +1,31 @@
-import { Users, RoleUsers } from '../models/index'
+import { Users, RoleUsers, Role } from '../models/index'
 import { Request, Response, NextFunction } from 'express'
 import { sendResponseFailure } from './responses'
-const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
-    // const checkUser = await Users.findByPk(req.user.id);
-    const isAdmin = await RoleUsers.findAll({
+
+const isUserAnAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    const adminId = await Role.findOne({
         where: {
-            userId: 5
+            name: 'Admin'
         }
     })
-    console.log(isAdmin)
-    // for (const nameOfRole of isAdmin!) {
-    //     if(nameOfRole.name === "admin") {
-    //         next()
-    //         return;
-    //     }
-    // }
-    return sendResponseFailure(401, 'wrong', res)
+    if (adminId) {
+        const isAdmin = await RoleUsers.findOne({
+            where: {
+                userId: req.user?.id,
+                roleId: adminId?.id
+            }
+        })
+        console.log(isAdmin);
+        if (isAdmin === null) {
+            return sendResponseFailure(401, 'Not allowed', res)
+        }
+        next();   
+    }
+    return sendResponseFailure(401, 'Not allowed', res)
 }
+
 const defensiveOptions = {
-    isAdmin: isAdmin
+    isUserAnAdmin: isUserAnAdmin
 }
 
 export default defensiveOptions

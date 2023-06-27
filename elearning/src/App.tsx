@@ -25,10 +25,18 @@ import { About,
   Unsubscribe, 
   VerifyAccountToken, 
   WatchLectures,
+  AddBadges,
+  ListBadges,
+  AddRequirmentTypeBadgeLazy,
+  AddBridgeCriteriaLazy,
+  CreateQuizzLazy,
+  QuizzListLazy,
 } from './LazyFiles'
 import { Suspense } from 'react'
 import Loading from './components/Loading/Loading'
 import LoaderSpinner from './UI/LoaderSpinner'
+import WatchLecturesVideo from './components/WatchLectures/WatchLecturesVideo'
+import EditQuizz from './components/AdminStuff/QuizzList/EditQuizz'
 // import NewLogin from './components/Login/NewLogin'
 function App() {
   const router = createBrowserRouter(
@@ -121,7 +129,13 @@ function App() {
           <Suspense fallback={<Loading />}>
             <WatchLectures />
           </Suspense>
-        } />
+        }>
+          <Route path=':id' element={
+            <Suspense fallback={<Loading />}>
+              <WatchLecturesVideo   />
+            </Suspense>
+          } />
+        </Route>
           <Route path='homepage' element={
                 <MainPage />
               // </Suspense>
@@ -176,6 +190,43 @@ function App() {
                   <ListOfUsers />
                 </Suspense>
               } />
+              <Route path='addbadges' element={
+                <Suspense fallback={<LoaderSpinner />}>
+                  <AddBadges />
+                </Suspense>
+              } />
+              <Route path='listbadges' element={
+                <Suspense fallback={<LoaderSpinner />}>
+                  <ListBadges />
+                </Suspense>
+              } />
+              <Route path='addrequirmentbadge' element={
+                <Suspense fallback={<LoaderSpinner />}>
+                  <AddRequirmentTypeBadgeLazy />
+                </Suspense>
+              } />
+              <Route path='addbadgecriteria' element={
+                <Suspense fallback={<LoaderSpinner />}>
+                  <AddBridgeCriteriaLazy />
+                </Suspense>
+              } />
+              <Route path='createquizz' element={
+                <Suspense fallback={<LoaderSpinner />}>
+                  <CreateQuizzLazy />
+                </Suspense>
+              } />
+              <Route path='quizzlist'>
+                <Route index element={
+                  <Suspense fallback={<LoaderSpinner />}>
+                  <QuizzListLazy />
+                </Suspense>
+                } />
+                <Route path=':id' element={
+                  <Suspense fallback={<LoaderSpinner />}>
+                      <EditQuizz />
+                  </Suspense>
+                }/>
+              </Route>
         </Route>
         <Route path='*' element={<DoesntExistPage />} />
       </Route>

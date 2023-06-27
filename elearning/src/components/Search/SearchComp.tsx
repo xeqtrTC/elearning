@@ -16,10 +16,6 @@ const SearchComp: FC = () => {
     }
 
     useEffect(() => {
-        
-    })
-
-    useEffect(() => {
         if(searchValue.length > 2) {
             getDataByName();
         } else if (searchValue.length < 2 ) {

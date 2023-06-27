@@ -38,9 +38,19 @@ const CourseTab = ({ course_id, createdAt, description, imageLink, levelOfCourse
                     <div>
                         <span className="text-[#6B6E79]">{description}</span>
                     </div>
-                    <div className="flex items-center text-[#6B6E79]">
-                        <img src='https://oyster.ignimgs.com/mediawiki/apis.ign.com/person-of-interest/b/b9/Poi_harold_finch.jpg' className="rounded-full w-10 h-10 object-cover" />
-                        <span className="px-3">Bosko Bezarevic</span>
+                    <div className="grid grid-cols-2 text-[#6B6E79] gap-1">
+                        {
+                            instructors?.map((itemInstructors) => {
+                                const { usernameOfInstructor, id } = itemInstructors
+                                return (
+                                    <div className="flex items-center" key={id}>
+                                        <img src='https://oyster.ignimgs.com/mediawiki/apis.ign.com/person-of-interest/b/b9/Poi_harold_finch.jpg' className="rounded-full w-10 h-10 object-cover" />
+                                        <Link to={`/about/instructor/${usernameOfInstructor}`} className="px-2 text-sm">{usernameOfInstructor}</Link>
+                                    </div>
+                                )
+                            })
+                        }
+                        
                     </div>
                     <div className="flex text-white justify-between space-x-2">
                         <button className="bg-[#0E111E] w-[50%] py-2 font-medium rounded-lg" onClick={showVideoFunction}>WATCH PREVIEW</button>

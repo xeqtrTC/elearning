@@ -6,6 +6,7 @@ import {
     addIncludeProps, 
     addinstructorProps, 
     addLectureProps, 
+    addLessonDetailsCompletionAttributes, 
     addPrerequisitesProps, 
     addQuestionAndAnswerProps, 
     addRoleProps, 
@@ -17,13 +18,21 @@ import {
     courseDetailsArraySecond, 
     courseDetailsQuery, 
     courseDetailsQueryProps, 
+    editQuizzAnswer, 
+    editQuizzQuestion, 
     editUserProfileProps, 
     getUserInfoProps, 
+    lessonPropsVideos, 
+    listBadgeCriteriaPros, 
+    listBadgeProps, 
     listFreqQuestionsProps, 
     ListInstructorsProps, 
     listOfCategoriesProps, 
     loginInterface, 
     mappedMessagesProps, 
+    quizzOrVideoProps, 
+    quizzOrVideoPropsType, 
+    quizzProps, 
     registerInterface, 
     removeOneChatProps, 
     removeRoleProps, 
@@ -69,6 +78,10 @@ export const getSingleCourse = async (name: string) => {
     const response = await eLearningAPI.get<courseDetailsArraySecond>(`/${courseRoute}/getOneCourse/${name}`);
     return response.data
 }
+export const getSingleCourseVideos = async (name: string) => {
+    const response = await eLearningAPI.get<courseDetailsQuery[]>(`/${courseRoute}/getSingleCourseDetailsForVideos/${name}`);
+    return response.data
+}
 export const purchaseCourseByUser = async (courseCollection: courseCollectionProps) => {
     console.log(courseCollection);
     return await eLearningAPI.post(`/${courseRoute}/addCourseToUser`, courseCollection);
@@ -97,8 +110,8 @@ export const getLecturesForCourse = async (course_id?: string) => {
     const response = await eLearningAPI.get(`${courseRoute}/getLectures/${course_id}`);
     return response.data
 }
-export const getSingleCourseDetails = async ({lessonID, courseId}: courseDetailsQueryProps) => {
-    const response = await eLearningAPI.get<courseDetailsQuery>(`${courseRoute}/getSingleCourseDetails/${courseId}/${lessonID}`)
+export const getSingleCourseDetails = async (id: string) => {
+    const response = await eLearningAPI.get<quizzOrVideoPropsType>(`${courseRoute}/getSingleCourseDetails/${id}`)
     console.log(response.data);
     return response.data
 }
@@ -200,5 +213,80 @@ export const removeAllChats = async () => {
 }
 export const removeOneChat = async (data: removeOneChatProps) => {
     return await eLearningAPI.post(`${socketRouter}/deleteOneChat`, data)
+}
+export const addLessonDetailsCompletion = async (data: addLessonDetailsCompletionAttributes) => {
+    return await eLearningAPI.post(`${courseRoute}/completeLessonDetails`, data)
+}
+export const addBadge = async (data: any) => {
+    return await eLearningAPI.post(`${courseRoute}/createBadge`, data)
+}
+export const ListBadgesAPI = async () => {
+    const response = await eLearningAPI.get<listBadgeProps[]>(`${courseRoute}/ListBadges`)
+    return response.data
+}
+export const ListBadgeCriteriaForBadges = async () => {
+    const response = await eLearningAPI.get<listBadgeCriteriaPros[]>(`${courseRoute}/queryCoursesForCreateBadges`)
+    return response.data
+}
+export const addRequirmentType = async (data: {reqType: string}) => {
+    return await eLearningAPI.post(`${courseRoute}/createRequirmentType`, data)
+}
+export const listRequirmentType = async () => {
+    const response = await eLearningAPI.get<{id: number, requirement: string}[]>(`${courseRoute}/listRequirmentType`);
+    return response.data;
+}
+export const addBadgeCriteria = async (data: {reqType_id: number}) => {
+    return await eLearningAPI.post(`${courseRoute}/createBadgeCriteria`, data)
+}
+export const listAllLessonsForQuizz = async () => {
+    const response = await eLearningAPI.get<{course_id: number, title: string, lessons: { lesson_id: number, description: string}[]}[]>(`${courseRoute}/listAllLessonsForQuizz`)
+    return response.data;
+}
+export const listLessonsPerCourse = async (courseId: number) => {
+    const response = await eLearningAPI.get<{lesson_id: number, description: string}[]>(`${courseRoute}/listLessonsPerCourse/${courseId}`)
+    return response.data
+}
+export const createQuizz = async (data:
+    {
+        quizzName: string,
+        quizzDescription: string,
+        lessonId: number,
+        questions: {
+            id: string,
+            question: string,
+            numberOfInputs: number
+        }[],
+        answers: {
+            id: string,
+            idOfQuestion: string,
+            answer: string,
+            numberOfAnswers: number
+        }[]
+    }
+    ) => {
+    return await eLearningAPI.post(`${courseRoute}/createQuizz`, data)
+}
+export const getListOfQuizz = async () => {
+    const response = await eLearningAPI.get<quizzProps[]>(`${courseRoute}/listAllQuizz`);
+    return response.data
+}
+export const deleteQuizz = async (data: {quizz_id: number}) => {
+    return await eLearningAPI.post(`${courseRoute}/deleteQuizz`, data)
+}
+export const findOneQuizz = async (id: string) => {
+    const response = await eLearningAPI.get<quizzProps>(`${courseRoute}/findOneQuizz/${id}`);
+    return response.data
+} 
+export const updateQuizzAnswer = async (data: editQuizzAnswer) => {
+    return await eLearningAPI.post(`${courseRoute}/updateQuizzAnswer`, data)
+}
+export const updateQuizzQuestion = async (data: editQuizzQuestion) => {
+    return await eLearningAPI.post(`${courseRoute}/updateQuizzQuestion`, data)
+}
+export const addReview = async (data: {
+    descriptionOfReview: string,
+    reviewCourseId: number
+}) => {
+    return await eLearningAPI.post(`${courseRoute}/addReview`, data)
 }
 export default eLearningAPI

@@ -1,8 +1,11 @@
-import { Table, Column, Model, HasMany, BelongsTo, PrimaryKey, DataType, BelongsToMany, ForeignKey } from 'sequelize-typescript';
+import { Table, Column, Model, HasMany, BelongsTo, PrimaryKey, DataType, BelongsToMany, ForeignKey, HasOne } from 'sequelize-typescript';
 import { Role, RoleUsers } from './role.model';
 import { UsersCourses } from './userCourses';
 import { Optional } from 'sequelize';
 import { PasswordResetToken } from './passwordResetToken.model';
+import { LessonDetailsCompletion } from './LessonsDetailsCompletion';
+import { LessonCompletion } from './LessonCompletion';
+import { reviews } from './review.model';
 
 export interface UsersAttributes {
   id?: number
@@ -73,4 +76,13 @@ export class Users extends Model<UsersAttributes, usercreationattributes> implem
 
     @HasMany(() => UsersCourses, { as: 'userCourses', foreignKey: 'userCourseId'})
     courseUserId!: UsersCourses[]
+
+    @HasMany(() => reviews, { foreignKey: 'username_id'})
+    reviews!: reviews
+
+    // @HasOne(() => LessonDetailsCompletion, { foreignKey: 'id'})
+    // lessonDetailsCompletion!: LessonDetailsCompletion
+
+    // @HasOne(() => LessonCompletion, { foreignKey: 'id'})
+    // lessonCompletion!: LessonCompletion
 }

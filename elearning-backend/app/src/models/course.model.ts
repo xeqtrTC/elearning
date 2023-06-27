@@ -1,4 +1,4 @@
-import { Table, Column, Model, HasMany, BelongsTo, PrimaryKey, DataType, BelongsToMany, ForeignKey } from 'sequelize-typescript';
+import { Table, Column, Model, HasMany, BelongsTo, PrimaryKey, DataType, BelongsToMany, ForeignKey, HasOne } from 'sequelize-typescript';
 import { InstructorsOnCourses, instructors } from './instructor.model';
 import { Lesson } from './lesson.models';
 import { prerequisites } from './prerequisites.models';
@@ -10,6 +10,7 @@ import { UsersCourses } from './userCourses';
 import { CourseIncludes } from './courseIncludes.model';
 import { Optional } from 'sequelize';
 import { frequentlyAskedQuestions } from './frequentlyAskedQuestions.models';
+import { CourseCompletion } from './CourseCompletion';
 
 export interface courseAttributes {
   course_id?: number,
@@ -114,6 +115,9 @@ export class Course extends Model<courseAttributes, courseCreationAttributes> im
 
   @HasMany(() => frequentlyAskedQuestions, { foreignKey: 'courseFreqID'})
   freqQuestions!: frequentlyAskedQuestions[]
+
+  @HasOne(() => CourseCompletion, { foreignKey: 'course_id'})
+  courseCompletion!: CourseCompletion
 }
 
 // module.exports =  (sequelize, Sequelize) => {

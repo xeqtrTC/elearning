@@ -17,10 +17,13 @@ import MeetInstructors from "./MeetInstructors";
 import CourseReview from "./CourseReviews";
 import CourseFreqQuestion from "./CourseFreqQuestion";
 import { purchaseCourseMutation } from "../../hooks/mutate";
+import UseAuthContext from "../../hooks/authUseContext";
+import UseAuthHook from "../../hooks/useAuthHook";
 
 const CourseDetails:FC = () => {
     const { name } = useParams();
     const navigate = useNavigate();
+    const { username } = UseAuthHook();
     const { error, setError, setLessonIDtoBeGiven, lessonIDtoBeGiven } = UseContextState();
     const overviewRef = useRef<HTMLDivElement>(null);
     const curriculumRef = useRef<HTMLDivElement>(null);
@@ -37,7 +40,6 @@ const CourseDetails:FC = () => {
     }
     const { mutate: purchaseMutation } = purchaseCourseMutation(); 
     const purchaseCourseFunction = (courseId: number) => {
-        console.log(courseId);
         const courseCollection = {
             courseId: courseId
         }
@@ -45,9 +47,8 @@ const CourseDetails:FC = () => {
     }
     const setLessonIdFunction = (lessonSecond_id: number) => {
         setLessonIDtoBeGiven(lessonSecond_id);
-        navigate(`/courses/${name}/lectures`)
+        navigate(`/courses/${name}/lectures/${lessonSecond_id}`)
     }
-    console.log(data);
     
     let content;
     if (isLoading) {
@@ -130,32 +131,7 @@ const CourseDetails:FC = () => {
                                         <p className="font-medium">The best way you learn is by doing. Not just watching endless tutorials. That's why a key part of this course is the real-world projects that you'll get to build. Plus they'll look great on your portfolio.</p>
                                     </div>
                                     <div className="grid md:grid-cols-3 gap-5">
-                                        {
-                                            whatyoubuild?.map((item: whatyoubuildProps) => {
-                                                const { 
-                                                    courseCourseId,
-                                                    createdAt,
-                                                    updatedAt,
-                                                    wub_description,
-                                                    wub_id,
-                                                    wub_imageLink,
-                                                    wub_title
-                                                    } = item
-                                                return (
-                                                    <WhatYouBuild 
-                                                    courseCourseId={courseCourseId} 
-                                                    createdAt={createdAt} 
-                                                    updatedAt={updatedAt} 
-                                                    wub_description={wub_description}
-                                                    wub_id={wub_id}
-                                                    wub_imageLink={wub_imageLink}
-                                                    wub_title={wub_title}
-                                                    key={wub_id}
-                                                    />
-                                                )
-                                            })
-                                        }
-
+                                        <WhatYouBuild data={whatyoubuild} />
                                     </div> 
                                 </div>
                             </div>
@@ -163,7 +139,7 @@ const CourseDetails:FC = () => {
 
                     }
                     <div ref={reviewRef}>
-                        <CourseReview />
+                        <CourseReview course_id={course_id}/>
                     </div>
                     <div className="bg-[#f6f6fb] py-20 font-Barlow">
                         <div className="w-[70%] m-auto">

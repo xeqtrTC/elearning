@@ -1,6 +1,7 @@
 import { useQuery, QueryCache, useQueryClient } from "react-query"
 import { 
     checkUniqueIDunsubscribe, 
+    findOneQuizz, 
     getAllCategories, 
     getAllCourses, 
     getAllLiveMessages, 
@@ -9,11 +10,18 @@ import {
     getAllUsers, 
     getCoursesForUser, 
     getLecturesForCourse, 
+    getListOfQuizz, 
     getSingleCourse, 
+    getSingleCourseVideos, 
     getSingleInstructor, 
     getUserInfoById, 
     listAllInstructors, 
+    listAllLessonsForQuizz, 
+    ListBadgeCriteriaForBadges, 
+    ListBadgesAPI, 
+    listLessonsPerCourse, 
     ListOfQuestions, 
+    listRequirmentType, 
     verifyRegisterToken, 
     whoAmI 
 } from "./api"
@@ -26,17 +34,26 @@ export const getCourseDetailsQuery = (name?: string) => {
         retry: false
     })
 }
+export const getCourseDetailsVideosQuery = (name?: string) => {
+    console.log('firing')
+    return useQuery({
+        queryKey: ['singleCourseVideoDetails', name],
+        queryFn: () => getSingleCourseVideos(name!),
+        retry: false
+    })
+}
 export const getAllCoursesQuery = () => {
     return useQuery({
         queryKey: ['coursesList'],
-        queryFn: getAllCourses
+        queryFn: getAllCourses,
+        retry: false
     })
 }
 export const whoAmIQuery = () => {
     return useQuery({
         queryKey: ['whoAmI'],
         queryFn: whoAmI,
-        retry: 3
+        retry: false
     })
 }
 export const getAllRolesQuery = () => {
@@ -121,6 +138,49 @@ export const getLectureCourse = (course_id: string) => {
         queryFn: () => getLecturesForCourse(course_id)
     })
 }
+export const ListBadgesQuery = () => {
+    return useQuery({
+        queryKey: ['listBadges'],
+        queryFn: ListBadgesAPI
+    })
+}
+export const ListBadgeCriteriaForBadgesQuery = () => {
+    return useQuery({
+        queryKey: ['courseListBadges'],
+        queryFn: ListBadgeCriteriaForBadges
+    })
+}
+export const ListRequirmentTypeQuery = () => {
+    return useQuery({
+        queryKey: ['listRequirmentType'],
+        queryFn: listRequirmentType
+    })
+}
 
+export const ListAllLessonsForQuizzQuery = () => {
+    return useQuery({
+        queryKey: ['listAllLessonsForQuizz'],
+        queryFn: listAllLessonsForQuizz
+    })
+}
 
+export const listLessonsPerCourseQuery = (courseId: number) => {
+    return useQuery({
+        queryKey: ['listLessonsPerCourse', courseId],
+        queryFn: () => listLessonsPerCourse(courseId)
+    })
+}
 
+export const listAllQuizzQuery = () => {
+    return useQuery({
+        queryKey: ['listOfQuizz'],
+        queryFn: getListOfQuizz
+    })
+}
+
+export const findOneQuizzQuery = (id: string) => {
+    return useQuery({
+        queryKey: ['findOneQuizz', id],
+        queryFn: () => findOneQuizz(id)
+    })
+}

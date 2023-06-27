@@ -84,3 +84,8 @@ export const removeSubscription = async (req: Request, res: Response) => {
         return sendResponseFailure(401, error.message, res)
     }
 }
+
+
+export const sendEmailWithPdf = async () => {
+    
+}

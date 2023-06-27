@@ -2,10 +2,10 @@ import { AxiosError, isAxiosError } from "axios"
 import { Dispatch, SetStateAction } from "react"
 import { useMutation, useQueryClient } from "react-query"
 import { useNavigate } from "react-router-dom"
-import { addCourseProps, addinstructorProps, whatWillYouBuildPropsTest } from "../components/Hooks/interfaces"
-import { addAnswerToQuestion, addCategory, addCourse, addCourseIncludes, addInstructor, addLectureAPI, addPrerequisites, addQuestionToCourse, addRolesToUser, editUserProfile, lessonDetailsAPI, logoutUser, purchaseCourseByUser, removeAllChats, removeOneChat, removeRoleFromUser, sendEmailToSubs, whatWillYouBuildAPI, whatWillYouLearnAPI } from "./api"
+import { addCourseProps, addinstructorProps, editQuizzAnswer, editQuizzQuestion, whatWillYouBuildPropsTest, zodTypeCreateQuizz } from "../components/Hooks/interfaces"
+import { addAnswerToQuestion, addBadge, addBadgeCriteria, addCategory, addCourse, addCourseIncludes, addInstructor, addLectureAPI, addLessonDetailsCompletion, addPrerequisites, addQuestionToCourse, addRequirmentType, addReview, addRolesToUser, createQuizz, deleteQuizz, editUserProfile, lessonDetailsAPI, logoutUser, purchaseCourseByUser, removeAllChats, removeOneChat, removeRoleFromUser, sendEmailToSubs, updateQuizzAnswer, updateQuizzQuestion, whatWillYouBuildAPI, whatWillYouLearnAPI } from "./api"
 import UseContextState from "./UseELearningContext"
-
+import { UseFormReset } from "react-hook-form/dist/types"
 interface addCategoryState { 
     setNameOfCategory: Dispatch<SetStateAction<string>>
 }
@@ -46,6 +46,12 @@ interface addWYBState {
 }
 interface sendEmailState {
     setText: Dispatch<SetStateAction<string>>
+}
+interface editQuizzState {
+    setDataToBeSetAnswer: Dispatch<SetStateAction<editQuizzAnswer>>
+}
+interface editQuestionQuizzState {
+    setDataToBeSetQuestion: Dispatch<SetStateAction<editQuizzQuestion>>
 }
 export const editUserMutation = () => {
     const { error, setError } = UseContextState(); 
@@ -251,6 +257,102 @@ export const removeOneChatMutation = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: 'liveRooms' })
             console.log('mutate gotov')
+        }
+    })
+}
+
+export const addLessonDetailsCompletionMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation(addLessonDetailsCompletion, {
+        onSuccess: (data) => {
+            queryClient.invalidateQueries('lessonID')
+            queryClient.invalidateQueries('singleCourseVideoDetails')
+            console.log('ovo ra di')
+            console.log(data);
+        },
+        onError: (error) => {
+            console.log(error);
+        }
+    })
+}
+
+export const addBadgeMutation = () => {
+    return useMutation(addBadge, {
+        onSuccess: () => {
+            console.log('ovo radi')
+        }
+    })
+}
+
+export const addRequirmentTypeMutation = () => {
+    return useMutation(addRequirmentType, {
+        onSuccess: () => {
+            console.log('radi')
+        }
+    })
+}
+
+export const addBadgeCriteriaMutation = () => {
+    return useMutation(addBadgeCriteria, {
+        onSuccess: () => {
+            console.log('ovo')
+        }
+    })
+}
+
+export const addQuizMutation = () => {
+    return useMutation(createQuizz, {
+        onSuccess: () => {
+            console.log('radi')
+        },
+        onError: (error) => {
+            console.log(error);
+        }
+    })
+}
+
+export const removeQuizzMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation(deleteQuizz, {
+        onSuccess: () => {
+            queryClient.invalidateQueries(['listOfQuizz'])
+        }
+    })
+}
+
+export const updateQuizzAnswerMutation = ({setDataToBeSetAnswer}: editQuizzState) => {
+    const queryClient = useQueryClient();
+    return useMutation(updateQuizzAnswer, {
+        onSuccess: () => {
+            console.log('radi')
+            queryClient.invalidateQueries(['findOneQuizz'])
+            setDataToBeSetAnswer({
+                isAnswerCorrect: false,
+                selectedAnswer: null,
+                editValue: ''
+            })
+        }
+    })
+}
+
+export const updateQuizzQuestionMutation = ({ setDataToBeSetQuestion }: editQuestionQuizzState) => {
+    const queryClient = useQueryClient();
+    return useMutation(updateQuizzQuestion, {
+        onSuccess: () => {
+            console.log('radi')
+            queryClient.invalidateQueries(['findOneQuizz'])
+            setDataToBeSetQuestion({
+                selectedAnswer: null,
+                editValue: ''
+            })
+        }
+    })
+}
+
+export const addReviewMutation = () => {
+    return useMutation(addReview, {
+        onSuccess: () => {
+            console.log('radi')
         }
     })
 }

@@ -29,11 +29,13 @@ const WatchLecturesHeader = ({ forwardLecture }: watchLecturesProps) => {
                     justify-center 
                     hover:border-r-[1px]
                     border-[#e8e8e8]'
+                    onClick={() => forwardLecture({ forwards: false, backwords: true })}
                     >
                         <MdOutlineKeyboardArrowLeft className='h-6 w-6' />
                         <span>Previous lesson</span>
                 </div>
-                <div className='w-[50%] flex items-center justify-center bg-[#32dd88] text-white cursor-pointer' onClick={forwardLecture}>
+                <div className='w-[50%] flex items-center justify-center bg-[#32dd88] text-white cursor-pointer' 
+                onClick={() => forwardLecture({ forwards: true, backwords: false})}>
                     <span>Complete and Continue</span>
                         <MdOutlineKeyboardArrowRight className='h-6 w-6' />
                 </div>

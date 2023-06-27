@@ -54,3 +54,29 @@ export const sendEmailUpon = async (email: string, uniqueID: string, text: strin
     })   
 }
 
+export const sendEmailWithPDF = ({emailOfUser, nameOfCourse, pdf, pdfName}: {
+    emailOfUser: string,
+    nameOfCourse: string,
+    pdf: string,
+    pdfName: string
+    }) => {
+    const sendEmail = {
+        from: emailSender,
+        to: emailOfUser,
+        subject: `Gratz you just  finished ${nameOfCourse} course!`,
+        text: 'gratz',
+        attachments: [
+            {
+                filename: `${pdfName}.pdf`,
+                path: `${pdf}.pdf`
+            }
+        ]
+    }
+    mailSetup.sendMail(sendEmail, (error, info) => {
+        if (info) {
+            return
+        } else if (error) {
+            console.log(error);
+        }
+    })
+}

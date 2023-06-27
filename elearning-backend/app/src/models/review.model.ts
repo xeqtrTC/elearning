@@ -1,21 +1,29 @@
-import { Table, Column, Model, HasMany, BelongsTo, PrimaryKey, DataType, ForeignKey } from 'sequelize-typescript';
+import { Table, Column, Model, HasMany, BelongsTo, PrimaryKey, DataType, ForeignKey, AutoIncrement } from 'sequelize-typescript';
 import { Course } from './course.model';
 import { Optional } from 'sequelize';
+import { Users } from './user.model';
 
 export interface reviewAttributes {
-    usernameOfReview: string,
+    review_id?: number,
+    username_id: number,
     descriptionOfReview: Text,
     reviewCourseId: number
 }
-interface reviewCreationAttributes extends Optional<reviewAttributes, 'usernameOfReview'> {}
+interface reviewCreationAttributes extends Optional<reviewAttributes, 'review_id'> {}
 
 @Table({ tableName: 'Reviews'})
 export class reviews extends Model<reviewAttributes, reviewCreationAttributes> implements reviewAttributes {
+    @PrimaryKey
+    @AutoIncrement
     @Column({
-        type: DataType.STRING,
+        type: DataType.INTEGER,
         allowNull: false
     })
-    usernameOfReview!: string;
+    review_id!: number
+
+    @ForeignKey(() => Users)
+    @Column
+    username_id!: number;
 
     @Column({
         type: DataType.TEXT,
@@ -30,6 +38,9 @@ export class reviews extends Model<reviewAttributes, reviewCreationAttributes> i
     })
     reviewCourseId!: number;
 
+    @BelongsTo(() => Users, { foreignKey: 'username_id'})
+    reviewUser!: Users
+    
     @BelongsTo(() => Course, { foreignKey: 'reviewCourseId'})
     reviewCourse!: Course
 }

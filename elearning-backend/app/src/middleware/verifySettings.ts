@@ -1,5 +1,5 @@
 import { sendResponseFailure } from './responses';
-import { EmailSubscription, Role, Users, UsersCourses, lessonDetails } from '../models/index' 
+import { EmailSubscription, Lesson, Quizz, Role, Users, UsersCourses, lessonDetails } from '../models/index' 
 import { Request, Response, NextFunction } from 'express'
 
 export const checkUsernameOrEmail = async (req: Request, res: Response, next: NextFunction) => {
@@ -70,22 +70,39 @@ export const checkDidUserPurchaseCourse = async (req: Request, res: Response, ne
 }
 
 export const checkDidUserPurchaseCourseGuardian = async (req: Request, res: Response, next: NextFunction) => {
-    const courseId  = req.params.courseId;
-    const lessonID = req.params.lessonID;
-    console.log(courseId, lessonID)
+    const id = req.params.id;
     // @ts-ignore
     const userId = req.user?.id
     try {
+        const isQuizz = await Quizz.findOne({
+            where: {
+                quizzFakeId: id
+            }
+        })
+        if (isQuizz) {
+            next();
+        }
         const checkIsModelPrivate = await lessonDetails.findOne({
             where: {
-                lessonDetail_id: lessonID
+                lessonDetail_fakeID: id
+            },
+        })
+        console.log(checkIsModelPrivate);
+        if (checkIsModelPrivate === null) {
+            return res.status(404);
+        }
+        const lessonModel = await Lesson.findOne({
+            where: {
+                lesson_id: checkIsModelPrivate?.lessonId
             }
         })
         const checkDidUserPurchase = await UsersCourses.findOne({ 
             where: {
-                courseUserId: courseId, userCourseId: userId
+                courseUserId: lessonModel?.courseId, userCourseId: userId
             }
         })
+        console.log(lessonModel, checkDidUserPurchase);
+       
         if (checkIsModelPrivate?.private === false) {
             next();
         } else if (checkIsModelPrivate?.private === true && checkDidUserPurchase === null) {
@@ -94,7 +111,7 @@ export const checkDidUserPurchaseCourseGuardian = async (req: Request, res: Resp
             next();
         }
     } catch (error: any) {
-        console.log('error')
+        console.log('erroraaaaaa', error)
         return res.status(401).json({ message: error.message})
     }
 }

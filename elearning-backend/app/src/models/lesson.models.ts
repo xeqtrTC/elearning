@@ -1,13 +1,18 @@
-import { Table, Column, Model, HasMany, BelongsTo, PrimaryKey, DataType, ForeignKey } from 'sequelize-typescript';
+import { Table, Column, Model, HasMany, BelongsTo, PrimaryKey, DataType, ForeignKey, HasOne } from 'sequelize-typescript';
 import { Course } from './course.model';
 import { lessonDetails } from './lessonDetails.model';
 import { Optional } from 'sequelize';
+import { LessonCompletion } from './LessonCompletion';
+import { Quizz } from './Quizz.model';
+import { QuizzLessonsCombined } from './quizzLessonsCombined.model';
+
 
 export interface lessonAttributes {
   lesson_id?: number,
   description: Text,
   instructor_id: number,
-  courseId: number
+  courseId: number,
+  isCompleted?: boolean
 }
 interface lessonCreateAttributes extends Optional<lessonAttributes, 'lesson_id'> {}
 
@@ -41,9 +46,21 @@ export class Lesson extends Model<lessonAttributes, lessonCreateAttributes> impl
   courseId!: number
 
   @BelongsTo(() => Course, { as: 'course', foreignKey: 'courseId'})
+  course!: Course
   
   @HasMany(() => lessonDetails, { as: 'details', foreignKey: 'lessonId'})
-  lessonDetails!: lessonDetails[]
+  details!: lessonDetails[]
+
+  @HasMany(() => Quizz, { foreignKey: 'lesson_id'})
+  quizz!: Quizz[]
+
+  @HasMany(() => QuizzLessonsCombined, { foreignKey: 'lesson_id'})
+  quzzLessonsComb!: QuizzLessonsCombined[]
+
+  @HasOne(() => LessonCompletion, { foreignKey: 'lesson_id'})
+  lessonComplete!: LessonCompletion
+
+ 
 }
 // module.exports =  (sequelize, Sequelize) => {
 //     const Lesson = sequelize.define("lesson", {

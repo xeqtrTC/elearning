@@ -15,7 +15,16 @@ import {
     frequentlyAskedQuestions,
     prerequisites,
     InstructorsOnCourses,
-    Users
+    Users,
+    LessonCompletion,
+    LessonDetailsCompletion,
+    Badges,
+    RequirementBadgesType,
+    BadgeForUsers,
+    Quizz,
+    QuizzQuestion,
+    QuizzAnswer,
+    QuizzLessonsCombined
 
 } from '../models/index'
 import { courseAttributes } from '../models/course.model';
@@ -31,19 +40,23 @@ import { freqAskedQuestionsAttributes } from '../models/frequentlyAskedQuestions
 import { answerAttributes } from '../models/answerOnQuestions.models';
 import { courseIncludesAttributes } from '../models/courseIncludes.model';
 import { categoryAttributes } from '../models/category.model';
-// const Courses = db.course
-// const Lesson = db.lesson
-// const Whatyoubuild = db.whatyoubuild
-// const Whatyoulearn = db.whatyoulearn
-// const lessondetails = db.lessondetails;
-// const Enrollment = db.enrollment;
-// const Reviews = db.reviews
-// const Prerequisites = db.prerequisites
-// const Instructors = db.instructors
-// const frequentlyAskedQuestions = db.frequentlyAskedQuestions
-// const courseIncludes = db.courseIncludes;
-// const answerOnQuestions = db.answerOnQuestions;
-// const Categories = db.categories
+import { BadgeCriteria } from '../models/badgeCritieria.model'
+import { v4 } from 'uuid';
+import { getPdf } from './pdfController';
+
+const generateRandomID = () => {
+    const maxLength = 7;
+    let id = '';
+  
+    while (id.length < maxLength) {
+      const randomString = v4().replace(/-/g, '');
+      const numericOnly = randomString.replace(/\D/g, ''); // Remove non-numeric characters
+      id += numericOnly;
+    }
+  
+    return id.slice(0, maxLength);
+  };
+  
 
 export const addNewCourse = async (req: Request, res: Response) => {
     const { title, description, instructor_id, imageLink, levelOfCourse, overview, biggerOverview, categoryId, isPrivate } = req.body;
@@ -94,11 +107,17 @@ export const addLessonDetails = async (req: Request, res: Response) => {
         title: title,
         video_link: video_link,
         lessonId: lessonLessonId,
-        private: privateLesson
+        private: privateLesson,
+        lessonDetail_fakeID: parseInt(generateRandomID())
     }
     console.log(addLessonDetails)
     try {
-        await lessonDetails.create(addLessonDetails);
+        const addedLessonD = await lessonDetails.create(addLessonDetails);
+        await QuizzLessonsCombined.create({
+            lesson_id: lessonLessonId,
+            lessonD_id: addedLessonD.lessonDetail_id,
+            quizz_id: null
+        })
         return res.status(201).json({ message: 'New lesson detail added'})
     } catch (error) {
         console.log(error);
@@ -227,6 +246,9 @@ export const getUsersCourses = async (req: Request, res: Response) => {
             }
         }, {
             model: Lesson, include: [{ model: lessonDetails, as: 'details'}]
+        },
+        {
+            model: instructors
         }
     ]
         })
@@ -251,32 +273,120 @@ export const getLecturesForCourse = async (req: Request, res: Response) => {
     }
 }
 
-export const getSingleCourseDetails = async (req: Request, res: Response) => {
-    const lessonID = req.params.lessonID
+export const getSingleCourseDetailsForVideos = async (req: Request, res: Response) => {
+    const nameOfCourse = req.params.nameOfCourse
     try {
-        const lectureDetails = await lessonDetails.findOne({
+        const courseId = await Course.findOne({
             where: {
-                lessonDetail_id: lessonID
+                title: nameOfCourse
             }
         })
+        // @ts-ignore
+            const listAllLessons = await Lesson.findAll({
+                where: {
+                    courseId: courseId?.course_id
+                },
+                include: [
+                    {
+                        model: QuizzLessonsCombined,
+                        include: [
+                            {
+                                model: lessonDetails,
+                            },
+                            {
+                                model: Quizz
+                            }
+                        ]
+                        // include: [
+                        //     {
+                        //         model: LessonDetailsCompletion,
+                        //         where: {
+                        //             // @ts-ignore
+                        //             user_id: req.user?.id ? req.user?.id : null
+                        //         },
+                        //         required: false
+                        //     },
+                            
+                            
+                        // ]
+                    },
+                ]
+            })
+            listAllLessons.map((item) => {
+                if (item.lessonComplete !== null) {
+                    item.setDataValue('isCompleted', true)
+                } 
+              
+            })
+            listAllLessons.map((item) => {
+                item?.details?.map((item) => {
+                    if (item.lessonCompletion !== null) {
+                        item.setDataValue('isCompleted', true)
+                    }
+                })
+            })
+            return sendResponseSuccess(200, listAllLessons, res) 
+            // @ts-ignore      
+    } catch (error: any) {
+        console.log(error);
+        return sendResponseFailure(404, error.message, res)
+    }
+
+}
+
+export const getSingleCourseDetails = async (req: Request, res: Response) => {
+    const id = req.params.id
+    try {
+        //@ts-ignore
+            const lectureDetails = await lessonDetails.findOne({
+                where: {
+                    lessonDetail_fakeID: id
+                },
+                include: [
+                    {
+                        model: LessonDetailsCompletion,
+                        where: {
+                            // @ts-ignore
+                            user_id: req.user?.id ? req.user.id : null
+                        },
+                        required: false,
+                        // attributes: []
+                    }
+                ]
+            })
+            
         if (!lectureDetails) {
+            const findQuizz = await Quizz.findOne({
+                where: {
+                    quizzFakeId: id
+                },
+                include: [
+                    {
+                        model: QuizzQuestion, include: [{ model: QuizzAnswer }]
+                    }
+                ]
+            })
+            if (findQuizz) {
+                return sendResponseSuccess(200, findQuizz, res)
+            }
             return res.status(404);
         }
+        const isCompleted = lectureDetails.lessonCompletion !== null;
+        lectureDetails.setDataValue('isCompleted', isCompleted)
         return res.status(200).json(lectureDetails);
     } catch (error: any) {
-        console.log('error', error)
+        console.log('erroraaaaaaa', error)
         return res.status(401).json({ message: error.message })
     }
 }
 
 export const addReview = async (req: Request, res: Response) => {
-    const { descriptionOfReview, courseCourseId } = req.body;
+    const { descriptionOfReview, reviewCourseId } = req.body;
     // @ts-ignore
-    const username = req?.user?.username
     const toBeAdded: reviewAttributes = {
-        usernameOfReview: username,
+        username_id: req.user?.id!,
         descriptionOfReview: descriptionOfReview,
-        reviewCourseId: courseCourseId
+        reviewCourseId: reviewCourseId
     }
     try {
         await reviews.create(toBeAdded);
@@ -439,9 +549,7 @@ export const listOfCategories = async (req: Request, res: Response) => {
     }
 }
 
-
-
-// in modui
+// in category.model.ts neeeded id of category
 export const deleteCategory = async (req: Request, res: Response) => {
     // const { categoryId } = req.body;
 
@@ -460,3 +568,474 @@ export const deleteCategory = async (req: Request, res: Response) => {
     // }
 }
 
+export const addLessonDetailsCompletion = async (req: Request, res: Response) => {
+    const { user_id, lessonDetail_id } = req.body
+    console.log(lessonDetail_id, 'ovo')
+    try {
+        // nadjemo lesson detalj
+        
+        // nadji ili napravi lesson details completion
+        const finishedLessonDetails = await LessonDetailsCompletion.findOrCreate({
+            where: {
+                // @ts-ignore
+                user_id: req.user?.id,
+                lessonDetails_id: lessonDetail_id,
+                date_completion: new Date()
+            }
+        })
+        // ako je napravljeno
+        const [completionRecord, created] = finishedLessonDetails;
+        if (created) {
+            const lessonId = await lessonDetails.findOne({
+                where: {
+                    lessonDetail_id: lessonDetail_id
+                }
+            })
+            // trazi svaki lesson detalj po idu
+            const lessonsDetailsMap = await lessonDetails.findAll({
+                where: {
+                    lessonId: lessonId?.lessonId
+                }
+            })
+            // mapuje preko lessonmap 
+            const promises = lessonsDetailsMap.map(detail => {
+                return LessonDetailsCompletion.findOne({
+                where: {
+                    lessonDetails_id: detail.lessonDetail_id,
+                    // @ts-ignore
+                    user_id: req.user?.id
+                }
+                });
+            });        
+            const isCompletedArray = await Promise.all(promises);
+            const isCompleted = isCompletedArray.every(value => !!value);
+            // ako je iscompleted true, dodati u lessoncomplete, mozda je korisnik zavrsio kurs? proveriti
+            if (isCompleted) {
+                console.log('zavrsena lekcija')
+                const findLessonId = await lessonDetails.findOne({
+                    where: {
+                        lessonDetail_id: lessonDetail_id
+                    }
+                })
+                await LessonCompletion.create({
+                    lesson_id: findLessonId?.lessonId,
+                    //@ts-ignore
+                    user_id: req.user?.id,
+                    date_completion: new Date()
+                })
+                 const lessonMap = await Lesson.findAll();
+                 const secondPromise = lessonMap.map(item => {
+                     return LessonCompletion.findOne({
+                         where: {
+                             lesson_id: item.lesson_id,
+                            //@ts-ignore
+                             user_id: req.user?.id
+                         }
+                     })
+                 })
+                 const isCourseCompleted = await Promise.all(secondPromise);
+                 const didUserCompleteCourse = isCourseCompleted.every(value => !!value)
+                 // zavrsio kurs
+                 if (didUserCompleteCourse) {
+                    console.log('zavrsio kurs')
+                    const lessonFind = await Lesson.findOne({
+                        where: {
+                            lesson_id: lessonId?.lessonId
+                        },
+                        include: [
+                            {
+                                model: Course
+                            }
+                        ]
+                    })
+                    console.log(lessonFind);
+                    // return sendResponseSuccess(201, lessonFind, res)
+                    const findProperBadgeCriteria = await BadgeCriteria.findOne({
+                        include: [
+                            {
+                                model: RequirementBadgesType,
+                                where: {
+                                    requirement: lessonFind?.course.title
+                                },
+                            },
+                            {
+                                model: Badges
+                            }
+                        ]
+                        
+                    })
+                    if (findProperBadgeCriteria) {
+                        // @ts-ignore
+                        console.log(req.user?.id, findProperBadgeCriteria)
+                        const findBadge = await Badges.findOne({
+                            where: {
+                                badge_id: findProperBadgeCriteria?.badges[0].badge_id
+                            }
+                        })
+                        console.log(findBadge);
+                        if (findBadge) {
+                            await BadgeForUsers.create({
+                                // @ts-ignore
+                                user_id: req.user?.id,
+                                badge_id: findBadge?.badge_id,
+                                date_completion: new Date()
+                            })
+                            console.log('lets see', )
+                            // @ts-ignore
+                            getPdf({nameOfCourse: lessonFind?.course.title, nameOfUser: req.user.username, emailOfUser: req.user.email})
+
+                        } else {
+                            console.log('nema badge')
+                        }
+
+                    }
+                 }
+
+                
+
+            }
+            // console.log(isCompleted, 'a')
+        }
+        // if (LessonDetailQuery) {
+        //     const listAllLessons = await Lesson.findAll({
+        //         where: {
+        //             lesson_id: LessonDetailQuery.lessonId
+        //         }
+        //     })
+        //     if (listAllLessons) {}
+        // }
+        
+
+        
+        return sendResponseSuccess(201, 'You completed this!', res)
+    } catch (error: any) {
+        console.log(error);
+        return sendResponseFailure(401, error.message, res)
+    }
+}
+
+export const ListBadges = async (req: Request, res: Response) => {
+    try {
+        const listBadgesQuery = await Badges.findAll();
+        return sendResponseSuccess(200, listBadgesQuery, res)
+    } catch (error: any) {
+        return sendResponseFailure(401, error.message, res)
+    }
+}
+
+export const queryBadgesCriteriaForCreateBadges = async (req: Request, res: Response) => {
+    try {
+        const listBadgeCriteria = await BadgeCriteria.findAll({
+            include: [
+                {
+                    model: RequirementBadgesType
+                }
+            ]
+        })
+        return sendResponseSuccess(200, listBadgeCriteria, res)
+    } catch (error: any) {
+        return sendResponseFailure(401, error.message, res)
+    }
+}
+
+export const createBadge = async (req: Request, res: Response) => {
+    const { nameOfBadge, badgeCriteriaId, title } = req.body;
+    const imageOfBadge = req.file?.filename
+    try {
+        await Badges.create({
+            badgeImage: imageOfBadge!,
+            badgeName: nameOfBadge,
+            badgeCriteriaId: badgeCriteriaId
+        })
+        return sendResponseSuccess(201, 'Success', res)
+    } catch (error: any) {
+        return sendResponseFailure(401, error.message, res)
+    }
+}
+
+export const createRequirmentType = async (req: Request, res: Response) => {
+    const { reqType } = req.body;
+    try {
+        await RequirementBadgesType.create({
+            requirement: reqType
+        })
+        return sendResponseSuccess(201, 'Created', res)
+    } catch (error: any) {
+        return sendResponseFailure(401, error.message, res)
+    }
+}
+
+export const createBadgeCriteria = async (req: Request, res: Response) => {
+    const { reqType_id } = req.body;
+    console.log(reqType_id, 'AAAAAAAA')
+    try {
+        await BadgeCriteria.create({
+            requirementType_id: reqType_id
+        })
+        return sendResponseSuccess(201, 'You created badge criteria', res)
+    } catch (error: any) {
+        console.log(error);
+        return sendResponseFailure(401, error.message, res)
+    }
+}
+
+export const listRequirmentType = async (req: Request, res: Response) => {
+    try {
+        const requirmentType = await RequirementBadgesType.findAll();
+        return sendResponseSuccess(200, requirmentType, res)
+    } catch (error: any) {
+        return sendResponseFailure(401, error.message, res)
+    }
+}
+
+const promisefn = ({answers, quizzQuestion_id }: {
+    answers: {
+        id: string,
+        idOfQuestion: string,
+        answer: string,
+        numberOfAnswers: number
+    }[],
+    quizzQuestion_id: number
+}  
+    ) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            for (const answerInsert of answers) {
+                await QuizzAnswer.create({
+                    quizz_answer_text: answerInsert.answer,
+                    quizz_question_id: quizzQuestion_id,
+                    quizz_isAnswerCorrect: true
+                })
+
+            }
+            return resolve(true)
+        } catch (error) {
+            return reject(false);
+        }
+    })
+}
+
+export const createQuizz = async (req: Request, res: Response) => {
+    const { quizzName, quizzDescription, lessonId, questions, answers }: {
+        quizzName: string,
+        quizzDescription: string,
+        lessonId: number,
+        questions: {
+            id: string,
+            question: string,
+            numberOfInputs: number
+        }[],
+        answers: {
+            id: string,
+            idOfQuestion: string,
+            answer: string,
+            numberOfAnswers: number,
+            isCorrect: string
+        }[]
+    }  = req.body;   
+    const answersPerQuestion = 4;
+    const numQuestions = questions.length;
+    const numAnswers = answers.length
+    try {
+        const quizzCreation = await Quizz.create({
+            quizz_name: quizzName,
+            quizz_description: quizzDescription,
+            lesson_id: lessonId,
+            quizzFakeId: parseInt(generateRandomID())
+        })
+
+        await QuizzLessonsCombined.create({
+            quizz_id: quizzCreation.quizz_id,
+            lesson_id: lessonId
+        })
+
+        for (let i = 0; i < numQuestions; i++) {
+            const questionInsert = questions[i]
+            // access 4 times
+            const questionCreation = await QuizzQuestion.create({
+                quizz_text: questionInsert.question,
+                quizz_id: quizzCreation.quizz_id
+            })
+            // console.log(i);
+            const quizzQuestionId = questionCreation.quizzQuestion_id;
+            const startIndex = i * answersPerQuestion; // Starting index for answers
+            const endIndex = startIndex + answersPerQuestion; // Ending index for answers
+            const slicedAnswers = answers.slice(startIndex, endIndex); // Extract answers for the current question
+            console.log(startIndex, endIndex, quizzQuestionId, 'NOVI')
+            for (const answerInsert of slicedAnswers) {
+                const isCorrectTrue = answerInsert.isCorrect === 'true'
+                await QuizzAnswer.create({
+                  quizz_answer_text: answerInsert.answer,
+                  quizz_question_id: quizzQuestionId,
+                  quizz_isAnswerCorrect: isCorrectTrue,
+                });
+              }
+            // const quizzQuestion_id = questionCreation.quizzQuestion_id
+            // const test = await promisefn({answers, quizzQuestion_id})
+            // console.log(test);
+        }
+
+        return sendResponseSuccess(201, 'You created quizz!', res)
+    } catch (error: any) {
+        console.log(error);
+        return sendResponseFailure(401, error.message, res)
+    }
+}
+
+export const createQuizzQuestions = async (req: Request, res: Response) => {
+    const { quizzId, quizzText } = req.body;
+    try {
+        await QuizzQuestion.create({
+            quizz_id: quizzId,
+            quizz_text: quizzText
+        })
+        return sendResponseSuccess(201, 'You crated quizz question', res)
+    } catch (error: any) {
+        return sendResponseFailure(401, error.message, res)
+    }
+}
+
+export const findOneQuizz = async (req: Request, res: Response) => {
+    const id = req.params.id;
+
+    try {
+        const findProperQuizz =  await Quizz.findOne({
+            where: {
+                quizz_id: id
+            },
+            include: [
+                {
+                    model: QuizzQuestion, include: [{ model: QuizzAnswer }]
+                }
+            ]
+        })
+        if (findProperQuizz) {
+            return sendResponseSuccess(200, findProperQuizz, res);
+        }
+        return sendResponseFailure(404, 'That quizz doesnt exist', res);
+    } catch (error: any) {  
+        return sendResponseFailure(401, error.message, res)
+    }
+}
+
+export const deleteQuizz = async (req: Request, res: Response) => {
+    const { quizz_id } = req.body;
+    console.log(quizz_id);
+    try {
+        const findQuizz = await Quizz.findOne({
+            where: {
+                quizz_id: quizz_id
+            }
+        })
+        if (findQuizz) {
+            const findQuestions = await QuizzQuestion.findAll({
+                where: {
+                    quizz_id: findQuizz?.quizz_id
+                }
+            })
+            if (findQuestions) {
+                const questionIds = findQuestions.map((item) => item.quizzQuestion_id)
+                const findAnswers = await QuizzAnswer.findAll({
+                    where: {
+                        quizz_question_id: questionIds
+                    }
+                })
+                const answersId = findAnswers.map((item) => item.quizz_answer_id)
+                await QuizzAnswer.destroy({
+                    where: {
+                        quizz_answer_id: answersId
+                    }
+                })
+                await QuizzQuestion.destroy({
+                    where: {
+                        quizzQuestion_id: questionIds
+                    }
+                })
+                await findQuizz.destroy();
+                return sendResponseSuccess(200, 'You deleted this quizz', res)
+            }
+        }
+        return sendResponseFailure(404, 'That quizz doesnt exist', res)
+    } catch (error: any) {
+        console.log(error);
+        return sendResponseFailure(401, error.message, res)
+    }
+}
+
+export const listAllQuizz = async (req: Request, res: Response) => {
+    try {
+        const listOfQuizzies = await Quizz.findAll();
+        if (listOfQuizzies) {
+            return sendResponseSuccess(200, listOfQuizzies, res);
+        }
+        return sendResponseFailure(404, 'There isnt any quizz', res)
+    } catch (error: any) {
+        return sendResponseFailure(401, error.message, res);
+    }
+}
+
+export const listAllLessonsForQuizz = async (req: Request, res: Response) => {
+    try {
+        const listCourses = await Course.findAll({
+            attributes: ['title', 'course_id']
+        });
+        return sendResponseSuccess(200, listCourses, res)
+    } catch (error: any) {
+        return sendResponseFailure(401, error.message, res)
+    }
+}
+
+export const updateQuizzQuestion = async (req: Request, res: Response) => {
+    const { selectedAnswer, editValue } = req.body;
+
+    try {
+        const findProperQuestion = await QuizzQuestion.findOne({
+            where: {
+                quizzQuestion_id: selectedAnswer
+            }
+        })
+        if (findProperQuestion) {
+            findProperQuestion.quizz_text = editValue;
+            await findProperQuestion.save();
+            return sendResponseSuccess(201, 'Edited Quizz', res)
+        }
+        return sendResponseFailure(404, 'There isny any question', res)
+    } catch (error: any) {
+        return sendResponseFailure(404, error.message, res)
+    }
+}
+
+export const updateQuizzAnswer = async (req: Request, res: Response) => {
+    const { editValue, isAnswerCorrect, selectedAnswer } = req.body;
+    try {
+        const quizzAnswerFound = await QuizzAnswer.findOne({
+            where: {
+                quizz_answer_id: selectedAnswer
+            }
+        })
+        if (quizzAnswerFound) {
+            quizzAnswerFound.quizz_answer_text = editValue,
+            quizzAnswerFound.quizz_isAnswerCorrect = isAnswerCorrect
+
+            await quizzAnswerFound.save();
+        }
+        return sendResponseSuccess(201, 'You created answer for quizz', res)
+    } catch (error: any) {  
+        return sendResponseFailure(401, error.message, res )
+    }
+}
+
+export const listLessonsPerCourse = async (req: Request, res: Response) => {
+    const courseId = req.params.courseId;
+    try {
+        const listLessons = await Lesson.findAll({
+            where: {
+                courseId: courseId
+            },
+            attributes: ['lesson_id', 'description']
+        })
+        return sendResponseSuccess(200, listLessons, res)
+    } catch (error: any) {
+        return sendResponseFailure(401, error.message, res)
+    }
+}

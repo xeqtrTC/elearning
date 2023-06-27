@@ -61,7 +61,8 @@ export interface lessonDetailsProps {
     lessonDetail_id: number,
     lessonId: number,
     title: string,
-    video_link: string
+    video_link: string,
+    
 }
 
 export interface courseDetailsQuery {
@@ -69,9 +70,12 @@ export interface courseDetailsQuery {
     lessonId: number,
     private: boolean,
     title: string,
+    lessonDetail_fakeID: number,
     video_link: string,
     updatedAt: string,
-    createdAt: string
+    createdAt: string,
+    isCompleted: boolean,
+    lessonCompletion: {id: number, lessonDetails_id: number, user_id: number, date_completion: Date}
 }
 
 export interface lessonProps {
@@ -79,7 +83,7 @@ export interface lessonProps {
     createdAt: string,
     updatedAt: string,
     description: string,
-    details?: lessonDetailsProps[],
+    details?: lessonDetailsVideoProps[],
     instructor_id: number,
     lesson_id: number,
     
@@ -129,15 +133,15 @@ export interface coursesForUserProps {
 }
 
 export interface AllCoursesForUserProps {
-        course_id: number,
-        createdAt: string,
-        description: string,
-        imageLink: string,
-        instructor_id: number,
-        lessons: lessonProps[],
-        levelOfCourse: string,
-        title: string,
-        updatedAt: string,
+    course_id: number,
+    createdAt: string,
+    description: string,
+    imageLink: string,
+    instructor_id: number,
+    lessons: lessonProps[],
+    levelOfCourse: string,
+    title: string,
+    updatedAt: string,
 }
 
 export interface courseDetailsArray {
@@ -301,11 +305,35 @@ export interface lectureProps {
     createdAt: string,
 }
 
+export interface lessonDetailsVideoProps {
+    createdAt: string,
+    updatedAt: string,
+    lessonDetail_id: number,
+    lessonId: number,
+    title: string,
+    video_link: string,
+    private: boolean,
+    lessonDetail_fakeID: number
+}
+
+export interface lessonPropsVideos {
+    lesson_id: number,
+    courseId: number,
+    description: string,
+    instructor_id: number,
+    details: courseDetailsQuery[],
+    quizz: quizzProps[]
+    updatedAt: string
+    createdAt: string,
+    isCompleted: boolean,
+}
+
 export interface courseDetailsWatchLectures {
-    lessons: lessonProps[],
+    lessons: lessonPropsVideos[],
     name: string | undefined,
     setLessonID: Dispatch<SetStateAction<number | undefined>>
-    lessonID: number | undefined
+    lessonID: number | undefined,
+    id?: string
 }
 
 export interface courseDetailsVideoProps {
@@ -313,12 +341,11 @@ export interface courseDetailsVideoProps {
 }
 
 export interface watchLecturesProps {
-    forwardLecture: () => void;
+    forwardLecture: ({ forwards, backwords}: {forwards: boolean, backwords: boolean}) => void;
 }
 
 export interface courseDetailsQueryProps {
-    lessonID?: number | undefined,
-    courseId: number | undefined
+    id?: number | undefined,
 }
 
 export interface errorStatusProps {
@@ -606,3 +633,98 @@ export interface mappedMessagesProps {
 export interface removeOneChatProps {
     idOfRoom?: string
 }
+
+export interface addLessonDetailsCompletionAttributes {
+    user_id?: number,
+    lessonDetail_id: number
+}
+
+export interface listBadgeProps {
+    id: number,
+    badgeImage: string,
+    badgeName: string,
+    updatedAt: string,
+    createdAt: string
+}
+
+export interface requirmentBadgeProps {
+    id: number,
+    requirement: string,
+    createdAt: string,
+    updatedAt: string
+}
+export interface listBadgeCriteriaPros {
+    id: number,
+    requirementType_id: number,
+    requirmentBadge: requirmentBadgeProps,
+    createdAt: string,
+    updatedAt: string
+}
+
+export interface mapQuestionInputsProps {
+    id: string,
+    question: string,
+    numberOfInputs: number
+}
+export interface mapAnswersInputProps {
+    id: string,
+    idOfQuestion: string,
+    answer: string,
+    numberOfAnswers: number,
+    isCorrect: string
+}
+
+export interface zodTypeCreateQuizz {
+    quizzName: string,
+    quizzDescription: string,
+    mapQuestionInputs: mapQuestionInputsProps[],
+    mapAnswersInput: mapAnswersInputProps[]
+}
+
+export interface quizzProps {
+    lesson_id: number,
+    quizzFakeId: number,
+    quizz_id: number,
+    quizz_name: string
+    quizz_description: string,
+    quizzQues?: quizzQuestionProps[]
+}
+
+export type quizzOrVideoProps = quizzProps | courseDetailsQuery
+
+export interface quizzOrVideoPropsType {
+    data: quizzOrVideoProps;
+  }
+export interface quizzQuestionProps {
+    quizz_id: number,
+    quizz_text: string,
+    quizzQuestion_id: number,
+    quizzAnswers: quizzAnswerProps[]
+}
+
+export interface quizzAnswerProps {
+    quizz_answer_id: number,
+    quizz_question_id: number,
+    quizz_isAnswerCorrect: boolean,
+    quizz_answer_text: string,
+}
+
+export interface leftsidePropsVideo {
+    description: string,
+    lesson_id: number,
+    isCompleted: boolean,
+    details: lessonDetailsVideoProps[],
+    quizz: quizzProps[]
+    id?: string
+}
+
+export interface editQuizzAnswer {
+    selectedAnswer: number | null,
+    editValue: string,
+    isAnswerCorrect: boolean
+}
+export interface editQuizzQuestion {
+    selectedAnswer: number | null,
+    editValue: string,
+}
+

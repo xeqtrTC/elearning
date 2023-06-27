@@ -14,7 +14,7 @@ const CoursesList = () => {
     const [activeCategory, setActiveCategory] = useState<number | null>(null);
     const { data, isSuccess, isLoading } = getAllCoursesQuery();
     const { data: dataCategory, isLoading: isLoadingCategory, error: errorCategory, isError: isErrorCategory } = getListOfCategories();
-    
+        console.log(data);
     useEffect(() => {
         if (data && isSuccess) {
             setArrayOfData(data);

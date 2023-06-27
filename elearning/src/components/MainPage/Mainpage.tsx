@@ -14,7 +14,7 @@ const MainPage = () => {
                 <div className="hidden h-[10%] md:inline">
                     <SearchComp />
                 </div>
-                <div className="bg-white  md:h-[85%] rounded-2xl py-5 px-7 ">
+                <div className="bg-white scrollbar-none  md:h-[85%] rounded-2xl py-5 px-7 overflow-y-scroll ">
                     <Outlet />
                 </div>
             </div>

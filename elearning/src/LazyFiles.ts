@@ -26,4 +26,10 @@ export const Unsubscribe = lazy(() => import('./components/Unsubscribe/Unsubscri
 export const VerifyAccountToken = lazy(() => import('./components/VerifyAccountToken/VerifyAccountToken')) 
 export const WatchLectures = lazy(() => import('./components/WatchLectures/WatchLectures'))
 export const Login = lazy(() => import('./components/RegisterAndLogin/Login'))
+export const AddBadges = lazy(() => import('./components/AdminStuff/AddBadges/AddBadges'))
+export const ListBadges = lazy(() => import('./components/AdminStuff/ListBadges/ListBadges'))
+export const AddRequirmentTypeBadgeLazy = lazy(() => import('./components/AdminStuff/AddBridgeCriteria/AddRequirmentTypeBadge'))
+export const AddBridgeCriteriaLazy = lazy(() => import('./components/AdminStuff/AddBridgeCriteria/AddBridgeCriteria'))
+export const CreateQuizzLazy = lazy(() => import('./components/AdminStuff/CreateQuizz/CreateQuizz'));
+export const QuizzListLazy = lazy(() => import('./components/AdminStuff/QuizzList/QuizzList'))
 // export const NewRegister = lazy(() => import('./components/Register/Register'))
