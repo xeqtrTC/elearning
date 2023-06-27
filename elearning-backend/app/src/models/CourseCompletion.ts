@@ -14,7 +14,6 @@ export interface CourseCompletionAttributes {
 
 interface CourseCompletionCreationAttributes extends Optional<CourseCompletionAttributes, 'id'> {}
 
-
 @Table({ tableName: 'CourseCompletion'})
 export class CourseCompletion extends Model<CourseCompletionAttributes, CourseCompletionCreationAttributes> implements CourseCompletionAttributes {
     

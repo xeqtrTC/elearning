@@ -26,8 +26,6 @@ export interface courseAttributes {
 
 interface courseCreationAttributes extends Optional<courseAttributes, 'course_id'> {}
 
-
-
 @Table({ tableName: 'Courses'})
 export class Course extends Model<courseAttributes, courseCreationAttributes> implements courseAttributes {
   @PrimaryKey
@@ -79,14 +77,11 @@ export class Course extends Model<courseAttributes, courseCreationAttributes> im
   imageLink!: string
 
 
-
-
-
-  @ForeignKey(() => Category) // Add ForeignKey decorator
+  @ForeignKey(() => Category) 
   @Column
   categoryId!: number;
 
-  @BelongsTo(() => Category, 'categoryId') // Specify the foreign key
+  @BelongsTo(() => Category, 'categoryId') 
   category!: Category;
 
   @BelongsToMany(() => instructors, () => InstructorsOnCourses)
@@ -119,55 +114,3 @@ export class Course extends Model<courseAttributes, courseCreationAttributes> im
   @HasOne(() => CourseCompletion, { foreignKey: 'course_id'})
   courseCompletion!: CourseCompletion
 }
-
-// module.exports =  (sequelize, Sequelize) => {
-//     const Course = sequelize.define("course", {
-//       course_id: {
-//         type: Sequelize.INTEGER,
-//         primaryKey: true,
-//         autoIncrement: true
-//       },
-//       title: {
-//         type: Sequelize.STRING,
-//         allowNull: false
-//       },
-//       description: {
-//         type: Sequelize.TEXT,
-//         allowNull: false
-//       },
-//       levelOfCourse: {
-//         type: Sequelize.STRING,
-//         allowNull: false,
-//       },
-//       overview: {
-//         type: Sequelize.TEXT,
-//       },
-//       biggerOverview: {
-//         type: Sequelize.TEXT
-//       },
-//       private: {
-//         type: Sequelize.BOOLEAN
-//       },
-//       imageLink: {
-//         type: Sequelize.STRING,
-//         allowNull: false
-//       },
-//     });
-//     Course.associate = (models) => {
-//         Course.hasMany(models.lesson),
-//         Course.hasMany(models.whatyoubuild),
-//         Course.hasMany(models.whatyoulearn),
-//         Course.hasMany(models.enrollment),
-//         Course.hasMany(models.reviews),
-//         Course.hasMany(models.courseIncludes),
-//         Course.hasMany(models.prerequisites),
-//         Course.hasMany(models.frequentlyAskedQuestions),
-//         Course.belongsTo(models.categories, { as: 'category' }),
-//         Course.belongsToMany(models.instructors, {
-//           through: "instructors_of_course",
-//           foreignKey: "courseId",
-//           otherKey: "instructorId"
-//         })
-//     };
-//     return Course
-//   };

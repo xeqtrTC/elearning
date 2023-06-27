@@ -9,7 +9,6 @@ export interface answerAttributes {
 }
 interface answerCreationAttributes extends Optional<answerAttributes, 'freqQuestionId'> {}
 
-
 @Table({ tableName: 'answersOnQuestion'})
 export class AnswerOnQuestion extends Model<AnswerOnQuestion,answerCreationAttributes> implements AnswerOnQuestion {
     @Column({
@@ -31,15 +30,3 @@ export class AnswerOnQuestion extends Model<AnswerOnQuestion,answerCreationAttri
     // @BelongsTo(() => frequentlyAskedQuestions)
     // frequentlyAskedQuestions?: frequentlyAskedQuestions[];
 }
-// module.exports = (sequelize, Sequelize) => {
-//     const answerOnQuestion = sequelize.define('answerOnQuestions', {
-//         answerOnQuestion: {
-//             type: Sequelize.STRING,
-//             allowNull: false
-//         }
-//     })
-//     answerOnQuestion.associate = (models) => {
-//         answerOnQuestion.belongsTo(models.frequentlyAskedQuestions, { foreignKey: 'freqQuestionId' })
-//     }
-//     return answerOnQuestion
-// }

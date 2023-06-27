@@ -8,7 +8,6 @@ export interface emailSubAttributes {
 
 interface emailCreationAttributes extends Optional<emailSubAttributes, 'emailOfSub'> {}
 
-
 @Table({ tableName: 'emailSubscription'})
 export class EmailSubscription extends Model<emailSubAttributes, emailCreationAttributes> implements emailSubAttributes {
     @Column({

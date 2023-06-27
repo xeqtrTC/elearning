@@ -14,7 +14,6 @@ export interface quizzAttributtes {
 
 interface quizzCreationAttributes extends Optional<quizzAttributtes, 'quizz_id'> {}
 
-
 @Table({ tableName: 'Quizz'})
 export class Quizz extends Model<quizzAttributtes, quizzCreationAttributes> implements quizzAttributtes {
     @PrimaryKey

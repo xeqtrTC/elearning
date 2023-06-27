@@ -25,7 +25,6 @@ export interface UsersAttributesPassport {
 }
 interface usercreationattributes extends Optional<UsersAttributes, 'username'> {}
 
-
 @Table({ tableName: 'Users'})
 export class Users extends Model<UsersAttributes, usercreationattributes> implements UsersAttributes {
     @PrimaryKey

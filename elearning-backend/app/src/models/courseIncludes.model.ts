@@ -8,7 +8,6 @@ export interface courseIncludesAttributes {
 }
 interface courseIncludesCreationAttributes extends Optional<courseIncludesAttributes, 'nameOfInclude'> {}
 
-
 @Table({ tableName: 'CourseIncludes'})
 export class CourseIncludes extends Model<courseIncludesAttributes, courseIncludesCreationAttributes> implements courseIncludesAttributes {
     @Column({
@@ -27,16 +26,3 @@ export class CourseIncludes extends Model<courseIncludesAttributes, courseInclud
     @BelongsTo(() => Course, { foreignKey: 'courseIncludeID'})
     courseId!: Course
 }
-
-// module.exports = (sequelize, Sequelize) => {
-//     const CourseIncludes = sequelize.define('courseIncludes', {
-//         nameOfInclude: {
-//             type: Sequelize.STRING,
-//             allowNull: false
-//         }
-//     })
-//     CourseIncludes.associate = (models) => {
-//         CourseIncludes.belongsTo(models.course)
-//     }
-//     return CourseIncludes
-// }

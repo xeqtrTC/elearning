@@ -4,7 +4,6 @@ import { Quizz } from "./Quizz.model";
 import { lessonDetails } from "./lessonDetails.model";
 import { Lesson } from "./lesson.models";
 
-
 export interface quizzLessonsCombinedAttributes {
     ql_id?: number,
     quizz_id: number | null,
@@ -13,7 +12,6 @@ export interface quizzLessonsCombinedAttributes {
 }
 
 interface quizzLessonsCombinedCreation extends Optional<quizzLessonsCombinedAttributes, 'ql_id'> {}
-
 
 @Table({ tableName: 'quizzLessonsCombined'})
 export class QuizzLessonsCombined extends Model<quizzLessonsCombinedAttributes,quizzLessonsCombinedCreation> implements quizzLessonsCombinedAttributes {

@@ -2,7 +2,6 @@ import { Optional } from "sequelize";
 import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, HasMany, Model, PrimaryKey, Table } from "sequelize-typescript";
 import { BadgeCriteria } from "./badgeCritieria.model";
 
-
 interface requirementTypeAttributes {
     id?: number,
     requirement: string,

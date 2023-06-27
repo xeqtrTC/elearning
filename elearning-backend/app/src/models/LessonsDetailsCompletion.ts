@@ -12,7 +12,6 @@ export interface lessonsDetailsCompletionAttributes {
 
 interface lessonCompletionDetailsCreationAttributes extends Optional<lessonsDetailsCompletionAttributes, 'id'> {}
 
-
 @Table({ tableName: 'LessonDetailsCompletion'})
 export class LessonDetailsCompletion extends Model<lessonsDetailsCompletionAttributes, lessonCompletionDetailsCreationAttributes> implements lessonsDetailsCompletionAttributes {
     
